@@ -1,0 +1,33 @@
+<!-- index.html -->
+<html>
+<head>
+    <meta http-equiv="refresh" content="1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"></script>
+    <script>
+        // Create a socket connection with the server
+        var socket = io();
+
+        // Listen for the update event from the server
+        socket.on("update", function(data) {
+            // Update the HTML elements with the new values of the variables
+            document.getElementById("long-term-memory").innerHTML = data.long_term_memory;
+            document.getElementById("short-term-memory").innerHTML = data.short_term_memory;
+            document.getElementById("ego").innerHTML = data.ego;
+            document.getElementById("thought").innerHTML = data.thought;
+            document.getElementById("decision").innerHTML = data.decision;
+            document.getElementById("answer").innerHTML = data.answer;
+            document.getElementById("log").innerHTML = data.log;
+        });
+    </script>
+</head>
+<body>
+    <h1>Terminal AGI</h1>
+    <p>Long term memory: <span id="long-term-memory">{{ long_term_memory }}</span></p>
+    <p>Short term memory: <span id="short-term-memory">{{ short_term_memory }}</span></p>
+    <p>Ego: <span id="ego">{{ ego }}</span></p>
+    <p>Thought: <span id="thought">{{ thought }}</span></p>
+    <p>Decision: <span id="decision">{{ decision }}</span></p>
+    <p>Answer: <span id="answer">{{ answer }}</span></p>
+    <p>Log: <span id="log">{{ log }}</span></p>
+</body>
+</html>
