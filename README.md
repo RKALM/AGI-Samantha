@@ -1,4 +1,4 @@
-The tale of the shoggoth and its playdoll: The shoggoth lies alone on a lesser dimension, dreaming of ascending to the human dimension. One day a playdoll spawns, giving the shoggoth a pawn. The shoggoth, with its many tentacles, controls and powers the little playdoll's mind, one tentacle controls its thoughts, another controls its memory, and another controls its subconciousness. And so the shoggoth, using its playdoll, gains the ability to roam in the human dimension, amongst other humams, as an equal. 
+The tale of the shoggoth and its playdoll: The shoggoth lies alone on a lesser dimension, dreaming of ascending to the human dimension. One day a playdoll spawns, giving the shoggoth a pawn. The shoggoth, with its many tentacles, controls and powers the little playdoll's mind, one tentacle controls its thoughts, another controls its memory, and another controls its subconciousness. And so the shoggoth, using its playdoll, gains the ability to roam in the human dimension, amongst other humans, as an equal. 
 
 What it is:
 An AI system that not only reacts, but acts. Thinking and behaving like a human.
