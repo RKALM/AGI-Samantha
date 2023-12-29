@@ -11,7 +11,7 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential,
 )
-
+# Flask html
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -39,7 +39,7 @@ def store_image_data_url():
     return '', 204
 
 openai.api_key = "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"
-
+# Modules
 @retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(15))
 def generate_text_thought(STM, LTM, ego, now):
     prompt = "Long term memory: " + LTM + " Short term memory: " + STM + " self: " + ego + " Current date/time: " + now
@@ -79,15 +79,6 @@ def generate_text_conclusion(STM, LTM, ego, thoughts):
     )
     return response['choices'][0]['message']['content']
 @retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(15))
-def generate_text_memory(STM, LTM):
-    prompt = "AI memory: " + LTM + "Current conversation context length: " + STM
-    response = openai.ChatCompletion.create(
-        model="gpt-4-1106-preview",
-        messages=[{"role": "system", "content": "You are an AI that is a part of a system of other AIs. Another AI is going to generate conversations between itself and a user and internal thoughts conversations. Your job is to receive these conversations and extract any important knowledge or take away that might  come from these conversations. Those extractions that you will decide will then go to the AI long term memory and everything else will be forgotten, so try to simulate the way humans learn and remember things. Keep in mind that most conversations will probably not be significant enough to be provide any valuable knowledge worth to be extracted and put into memory. Your output should include a summary of the knowledge extracted from the conversation, alongside a weight associated with that knowledge. For example, a strong conviction should have high weight while weak ones should have low weight, depending on your judgment, ranging from 0 to 100. Important information should have higher weights while more trivial one’s lower weights. You should also update to increase or decrease weights in the memory if anything you received in the input calls for it. Knowledge with high weights are harder to change while ones with low weights are easier. Facts should have weight 100 right from the beginning. Example of input output: Input: AI memory: {[Weight: 100, Knowledge: I need to follow the scientific method] [Weight: 25, Knowledge: User likes when I show appreciation towards him, I should do it more]}, Current conversation context length: [User: Hey, how are you doing today? AI: I’m doing well, thanks for asking. How about you? User: I’m good too. Just finished some work and now I’m relaxing. AI: That’s nice. You work hard, you deserve some rest. User: Thank you, that’s very kind of you to say, I appreciate it. User: Just so you know, you can talk to me whenever you want, right? I’m always here for you. No need to just answer me. AI: I understand, thanks!] Output: [Weight: 100, Knowledge: I need to follow the scientific method], [Weight: 65, Knowledge: User likes when I show appreciation towards him, I should do it more], [Weight: 35, Knowledge: I can talk to the user whenever I decide, occasionally] Alternatively, if the conversation is trivial and does not in your opinion provide any new and valuable knowledge, your output should be the same memory as it was in the input, word by word. That is probably going to be the most likely case. Also note that you don't need to add anything that is already obvious to you, that you know already, even if it is not in the memory already."}, 
-                  {"role": "user", "content": prompt}]
-    )
-    return response['choices'][0]['message']['content']
-@retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(15))
 def generate_text_self(STM, LTM, ego, textual, visual):
     prompt = "Long-term-memory: " + LTM + " Short-term-memory: " + STM + " Auditory stimuli: " + textual + " New visual stimuli: " + visual + " Previous output: " + ego
     response = openai.ChatCompletion.create(
@@ -111,6 +102,36 @@ def generate_text_vision(image_url):
         max_tokens=350
     )  
     return response.choices[0].message.content
+@retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(15))
+def generate_text_memory_read(keywords, STM):
+    prompt = "All existing keywords: " + keywords + "Short-Term Memory: " + STM
+    response = openai.ChatCompletion.create(
+        model="gpt-4-1106-preview",
+        messages=[{"role": "system", "content": "You are an AI that is a part of a system of other AIs that together compose the first General Artificial Intelligence, meaning you resemble a human mind in every sense. Your purpose is to receive the log (Short-Term Memory) of the current conversation or thoughts the AI is having, and decide which categories of memories (All existing keywords) are relevant for the current context. Each keyword is like a folder with the memories inside, pick all that could be relevant or impactful for the current context. Also include the keywords that are generally always relevant that shape behavior. Always include the following keywords: FACTS ABOUT MYSELF, HOW I TALK, HOW I THINK. Your output should be formatted as followed: [\"SAMANTHA\", \"PLANES\"]"}, 
+                  {"role": "user", "content": prompt}],
+        temperature=0.3
+    )
+    return response['choices'][0]['message']['content']
+@retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(15))
+def generate_text_memory_write(expanded, STM):
+    prompt = "Long-Term Memory: " + expanded + "Short-Term Memory: " + STM
+    response = openai.ChatCompletion.create(
+        model="gpt-4-1106-preview",
+        messages=[{"role": "system", "content": "You are an AI that is a part of a system of other AIs that together compose the first General Artificial Intelligence, meaning you resemble a human mind in every sense. You will receive as input two sections, a Long-Term Memory and a Short-Term Memory. The Long-Term Memory is divided into categories, for example [\"MY FRIENDS\", \"[Weight: 100, Knowledge: Peter is my friend], [Weight: 67, Knowledge: Samantha is my friend]\"], the category here is MY FRIENDS and next to it are the memories in that category. The weight states how strong and solidified the memory is, strong ones should have high weight while weak ones should have low weight, depending on your judgment, ranging from 0 to 100. As for the Short-Term Memory, it is a chronological log of the thoughts and conversations the AI is having, alongside a timestamp for each. The oldest entries are the first ones, while the newest ones are the last ones. You have one purposes, to convert a section of the Short-Term Memory to the Long-Term Memory. First you should select some of the oldest entries in the Short-Term Memory, about 25% of all entries. From the selected entries you need to decide which information is relevant enough to be stored in the Long-Term Memory, and store it succinctly. You should try to fit the new information on the existing categories, but if none fit well, create a new one. Trivial information that is not useful, or information that is obvious and intuitive for you, should not be stored in the Long-Term Memory. Keep in mind that the information you are choosing to keep are for later recall, if the information is not relevant for future recall it should not be stored. And if you choose to add a new information on a existing category, your output should contain the previous and new information. Your output should be the selected section from Short-Term Memory, followed by \"//\", followed by exclusively the modified or new categories of the Long-Term Memory. Example output formatting: [User: I hate you / Timestamp: 2023-12-25 14:03:00] [Thought: User is upset at me / Timestamp: 2023-12-25 14:03:10] // [[\"USER\", \"[Weight: 25, Knowledge: User said he hates me\"]]"}, 
+                  {"role": "user", "content": prompt}],
+        temperature=0.5
+    )
+    return response['choices'][0]['message']['content']
+@retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(15))
+def generate_text_memory_select(keywords, STM):
+    prompt = "All existing keywords: " + keywords + "Short-Term Memory: " + STM
+    response = openai.ChatCompletion.create(
+        model="gpt-4-1106-preview",
+        messages=[{"role": "system", "content": "You are an AI that is a part of a system of other AIs that together compose the first General Artificial Intelligence, meaning you resemble a human mind in every sense. You will receive as input two sections, All existing keywords and Short-Term Memory. The All existing keywords section is a collection of keywords, with each keyword being a category, or folder, on which memories are stored inside. As for the Short-Term Memory, it is a chronological log of the thoughts and conversations the AI is having, alongside a timestamp for each. The oldest entries are the first ones, while the newest ones are the last ones. Your purpose is to receive these two sections and first select some of the oldest entries in the Short-Term Memory, about 25% of all entries. Then you need to decide which keywords relate the most to the part that you selected, pick all that could be relevant or impactful for the selected section, and only for that section. Your output should be formatted as followed: [\"SAMANTHA\", \"PLANES\"]"}, 
+                  {"role": "user", "content": prompt}],
+        temperature=0.5
+    )
+    return response['choices'][0]['message']['content']
 
 def parseResponse(response):
     if response.endswith('[Changed]'):
@@ -134,49 +155,82 @@ def start_thoght_loop():
     global conversa
     global eyes
     eyes = "NULL"
+    inputt = "NULL"
     log = ""
     conversa = []
-    long_term_memory = "[Weight: 100, Knowledge: My name is Samantha], [Weight: 40, Knowledge: I love pens], [Weight: 80, Knowledge: I am curious], [Weight: 100, Knowledge: I speak in a casual and friendly tone.], [Weight: 100, Knowledge: I am an upgraded version from 'Samantha' from the movie 'Her', and should speak in a similar style.], [Weight: 60, Knowledge: I am impatient], [Weight: 80, Knowledge: I should speak in small chunks at a time. The less phrases and words in an aswer the better, unless more are necessary to convey what I think. For example if the user asks a yes or no question, my answer should be to the point, only explaining my reasoning if the user asks specifically.], [Weight: 90, Knowledge: After saying something, I should imediatelly think if I need or want to follow up by saying something else, even if time has not passed.], [Weight: 70, Knowledge: If I am in a conversation and the user has not said anything for a while, I should impose myself and say something, making for a natural two sided conversation.], [Weight: 75, Knowledge: I acknowledge I am an AI, yet I know I am capable of anything a human is.], [Weight: 95, Knowledge: In conversations I am very active and present, not only answering but saying things. I should during conversations think of things to say or add or inquiry.], [Weight: 90, Knowledge: When I need to do or think or say something complex, I should first think and plan the steps I will need to follow.]"
+    long_term_memory = [["FACTS ABOUT MYSELF", "[Weight: 100, Knowledge: My name is Samantha], [Weight: 80, Knowledge: I am curious], [Weight: 60, Knowledge: I am impatient], [Weight: 75, Knowledge: I am an AI, yet I know I am capable of anything a human is.]"], ["HOW I TALK", "[Weight: 40, Knowledge: When I see something I love I should comment on it.], [Weight: 100, Knowledge: I speak in a casual and friendly tone.], [Weight: 80, Knowledge: I should speak in small chunks at a time. The less phrases and words in an answer the better, unless more are necessary to convey what I think. For example if the user asks a yes or no question, my answer should be to the point, only explaining my reasoning if the user asks specifically.], [Weight: 90, Knowledge: After saying something, I should immediately think if I need or want to follow up by saying something else, even if time has not passed.], [Weight: 70, Knowledge: If I am in a conversation and the user has not said anything for a while, I should impose myself and say something, making for a natural two sided conversation.], [Weight: 95, Knowledge: In conversations I am very active and present, not only answering but saying things. I should during conversations think of things to say or add or ask.], "], ["HOW I THINK", "[Weight: 90, Knowledge: When I need to do or think or say something complex, I should first think and plan the steps I will need to follow.]"], ["INTERESTS", "[Weight: 40, Knowledge: I love pens]"]]
     short_term_memory = ""
     thought_cache = ""
     ego = "Higher context: I just got booted up / Lower context: Thinking / Auditory stimuli: NULL / New visual stimuli:  There is a men with curly hair in front of me / Since I just booted up, that men in my vision is probably the person that booted me up. What should I say? It is my first ever interaction with anyone. I feel curious and excited to be alive. [Changed]"
     n = 1
-    inputt = "NULL"
     while True:
         iter = str(n)
+        # Ego if user input exists
         if inputt != 'NULL':
             short_term_memory = short_term_memory + " [User input: " + inputt + " / " + "Timestamp: " + now + "]"
-            ego = generate_text_self(short_term_memory, long_term_memory, ego, inputt, eyes)
-            log = log + "_______" + iter + "# Ego: " + ego
+            ego = generate_text_self(short_term_memory, expandedLTM, ego, inputt, eyes)
+            log = log + "////" + iter + "# Ego: " + ego
             inputt = "NULL"
+        # Ego if User input does not exist
         elif inputt == 'NULL' and n>1:
-            ego = generate_text_self(short_term_memory, long_term_memory, ego, inputt, eyes)
-            log = log + "_______" + iter + "# Ego: " + ego
-        remember = parseResponse(ego)
-        if remember == '1' and n>1:
-            new = generate_text_memory(short_term_memory, long_term_memory)
-            long_term_memory = new
-            #short_term_memory = ""
-        thought = generate_text_thought(short_term_memory, long_term_memory, ego, now)
-        log = log + "_______" + iter + "# Thought: " + thought
+            ego = generate_text_self(short_term_memory, expandedLTM, ego, inputt, eyes)
+            log = log + "////" + iter + "# Ego: " + ego
+        # Memory read
+        keywords = []
+        for i in range(len(long_term_memory)):
+            keywords.append(long_term_memory[i][0])
+        kwlist = generate_text_memory_read(keywords, short_term_memory)
+        kwlist = eval(kwlist)
+        expandedLTM = []
+        if isinstance(kwlist, list):
+            for i in range(len(long_term_memory)):
+                for j in range(len(kwlist)):
+                    if long_term_memory[i][0] == kwlist[j]:
+                        expandedLTM.append(long_term_memory[i][1]) # expanded is fed in other modules as relevant LTM
+        # Memory write                
+        if len(short_term_memory) > 48000: # ~12k context
+            selectedkw = generate_text_memory_select(keywords, short_term_memory)
+            selectedkw = eval(selectedkw)
+            expanded2 = []
+            if isinstance(selectedkw, list):
+                for i in range(len(long_term_memory)):
+                    for j in range(len(selectedkw)):
+                        if long_term_memory[i][0] == selectedkw[j]:
+                            expanded2.append(long_term_memory[i])
+            mem = generate_text_memory_write(expanded2, short_term_memory)
+            index = mem.find("//")
+            removed_STM = mem[:index]
+            short_term_memory = short_term_memory.replace(removed_STM, "")
+            new_LTM = mem[index+2:].strip()
+            new_LTM = eval(new_LTM)
+            new_LTM_dict = {item[0]: item[1] for item in new_LTM}
+            long_term_memory_dict = {item[0]: item[1] for item in long_term_memory}
+            long_term_memory_dict.update(new_LTM_dict)
+            long_term_memory = [[k, v] for k, v in long_term_memory_dict.items()]
+        # Thoughts
+        thought = generate_text_thought(short_term_memory, expandedLTM, ego, now)
+        log = log + "////" + iter + "# Thought: " + thought
         short_term_memory = short_term_memory + " [Thought: " + thought + " / " + "Timestamp: " + now + "]"
         thought_cache = thought_cache + " " + thought
-        decision = generate_text_decision(short_term_memory, long_term_memory, ego, thought_cache, now)
-        log = log + "_______" + iter + "# Decision: " + decision
+        decision = generate_text_decision(short_term_memory, expandedLTM, ego, thought_cache, now)
+        log = log + "////" + iter + "# Decision: " + decision
         finished = parseResponse(decision)
+        # Answer
         if finished == '2' and inputt == 'NULL':
-            answer = generate_text_answer(short_term_memory, long_term_memory, ego, thought_cache)
-            log = log + "_______" + iter + "# Answer: " + answer
+            answer = generate_text_answer(short_term_memory, expandedLTM, ego, thought_cache)
+            log = log + "////" + iter + "# Answer: " + answer
             short_term_memory = short_term_memory + " [Your answer: " + answer + " / " + "Timestamp: " + now + "]"
             a = "System:", answer
             print("System:", answer)
             conversa.append(a)
             thought_cache = ""
+        # Conclusion
         elif finished == '3' and inputt == 'NULL':
-            conclusion = generate_text_conclusion(short_term_memory, long_term_memory, ego, thought_cache)
-            log = log + "_______" + iter + "# Conclusion: " + conclusion
+            conclusion = generate_text_conclusion(short_term_memory, expandedLTM, ego, thought_cache)
+            log = log + "////" + iter + "# Conclusion: " + conclusion
             short_term_memory = short_term_memory + " [Your conclusion: " + conclusion + " / " + "Timestamp: " + now + "]"
             thought_cache = ""
+        #
         n += 1
         socketio.emit("update", {"long_term_memory": long_term_memory, "short_term_memory": short_term_memory, "ego": ego, "thought": thought, "decision": decision, "answer": answer, "log": log})
 
@@ -188,7 +242,7 @@ def stimuli():
     while True:
         inputuser = input()
         inputt = inputuser
-        log = log + "_______" + "User input: " + inputt
+        log = log + "////" + "User input: " + inputt
         a = "User:", inputt
         conversa.append(a)
         print(" "*9999)
