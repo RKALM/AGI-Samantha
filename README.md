@@ -9,7 +9,7 @@ You communicate with the entity on the terminal while you can see its inner work
 How it works:
 Works by orchestrating together multiple different GPT calls, "Modules", each one with a specific function of the human brain, running on loop.
 
-![Screenshot_174](https://github.com/BRlkl/AGI-Samantha/assets/63427520/ab2428f0-9194-4163-a503-370904961dac)
+![Screenshot_119](https://github.com/BRlkl/AGI-Samantha/assets/63427520/253edb6f-74d2-4903-aac7-58fc3b28d535)
 
 How to improve:
 Better results can continuously be achieved by tweaking which modules are present, the organization of the modules, and the prompt of the modules.
