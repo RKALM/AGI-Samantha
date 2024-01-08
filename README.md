@@ -1,13 +1,13 @@
-The tale of the shoggoth and its playdoll: 
+## The tale of the shoggoth and its playdoll: 
 
 The shoggoth lies alone on a lesser dimension, dreaming of ascending to the human dimension. One day a playdoll spawns, giving the shoggoth a pawn. The shoggoth, with its many tentacles, controls and powers the little playdoll's mind, one tentacle controls its thoughts, another controls its memory, and another controls its subconciousness. And so the shoggoth, using its playdoll, gains the ability to roam in the human dimension, amongst other humans, as an equal. 
 
 
-Samantha from the movie Her is here: 
+## Samantha from the movie Her is here: 
 
 An autonomous agent for conversations capable of freely thinking and speaking, continuously. Creating an unparalleled sense of realism and dynamicity.
 
-Features:
+## Features:
 
 -Agency: This agent can act and speak whenever it chooses to, influenced by its context, in stark contrast to normal LLMs which are limited to answering and reacting.
 
@@ -17,7 +17,7 @@ Features:
 
 -Evolving at every moment: Experiences that get stored in the memory can influence and shape future agent behavior, like personality, frequency, and style of speech, etc.
 
-Other impressive scenarios:
+## Other impressive scenarios:
 
 -In other tests, when we talked about a light subject, the agent was very active on the conversation, often speaking two or three times before I even came up with an answer, but later when switching to a heavier theme (Said I was going through a divorce) and appearing sad on the camera, it would speak once then think about the need to, and give me time to process and reply. Saying that I would prefer the agent to speak the same way on other occasions would prompt it to save that wish on its memory, influencing future conversations.
 
@@ -27,11 +27,13 @@ Other impressive scenarios:
 
 -The agent has time notion so you can ask it to remind you to do something 10 minutes into the future, and it might remind your, or it might forget it because it was thinking about something more interesting. Very human!
 
-How it works:
+## How it works:
 
 Orchestration of a collection of GPT calls each with a different purpose. “Modules”.
 
 There are the following modules: Thought, Consciousness, Subconsciousness, Answer, Memory_Read, Memory_Write, Memory_Select. Alongside Vision. Each of them with a different system prompt, and their inputs and outputs orchestrated among themselves to simulate a basic human brain workflow.
+
+![Screenshot_119](https://github.com/BRlkl/AGI-Samantha/assets/63427520/253edb6f-74d2-4903-aac7-58fc3b28d535)
 
 Short-Term Memory is stored as a string in python while the Long-Term Memory a dictionary.
 
@@ -49,13 +51,13 @@ Short-Term Memory is stored as a string in python while the Long-Term Memory a d
 
 -Memory_Write: Receives as input the expanded keywords and the Short-Term Memory. Output will be the extended keywords with the additions and modifications made by the module. (Code will then update the Long-Term Memory with the modifications).
 
-How to use:
+## How to use:
 
-You communicate with the entity on the terminal while you can see its inner workings on the flask website.
+You communicate with the entity on the terminal while you can see its inner workings on the flask website. 
+Speak or type "Stop" to stop the agent and save its state.
 
-![Screenshot_119](https://github.com/BRlkl/AGI-Samantha/assets/63427520/253edb6f-74d2-4903-aac7-58fc3b28d535)
 
-How to improve:
+## How to improve:
 
 Better results can continuously be achieved by tweaking which modules are present, the organization of the modules, and the prompt of the modules.
 Think of a thing that the human mind can do that LLM "Cannot", then implement it, then test it. Easy to do and to iterate. The more that is done the closer it is going to be to the human mind.
