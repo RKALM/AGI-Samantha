@@ -243,8 +243,8 @@ def start_thoght_loop():
         for i in range(len(long_term_memory)):
             keywords.append(long_term_memory[i][0])
         keywords = str(keywords)
-        #kwlist = generate_text_memory_read(keywords, short_term_memory)
-        kwlist = eval(keywords)
+        kwlist = generate_text_memory_read(keywords, short_term_memory)
+        kwlist = eval(kwlist)
         expandedLTM = []
         if isinstance(kwlist, list):
             for i in range(len(long_term_memory)):
