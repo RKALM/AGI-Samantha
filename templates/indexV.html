@@ -22,20 +22,19 @@
     <video id="webcam" autoplay></video>
     <canvas id="canvas" style="display:none;"></canvas>
     <img id="frame" src="">
-    <p id="path"></p> <!-- Added this line -->
-    <p>Long-Term Memory: <span id="long-term-memory">{{ long_term_memory }}</span></p>
-    <p>Short-Term Memory: <span id="short-term-memory">{{ short_term_memory }}</span></p>
-    <p>Subconsciousness: <span id="subconsciousness">{{ subconsciousness }}</span></p>
+    <p id="path"></p>
     <p>Thought: <span id="thought">{{ thought }}</span></p>
     <p>Consciousness: <span id="consciousness">{{ consciousness }}</span></p>
+    <p>Subconsciousness: <span id="subconsciousness">{{ subconsciousness }}</span></p>
     <p>Answer: <span id="answer">{{ answer }}</span></p>
+    <p>Long-Term Memory: <span id="long-term-memory">{{ long_term_memory }}</span></p>
+    <p>Short-Term Memory: <span id="short-term-memory">{{ short_term_memory }}</span></p>
     <p>Log: <span id="log">{{ log }}</span></p>
     <script>
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const frame = document.getElementById('frame');
         const path = document.getElementById('path');
-
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
@@ -49,9 +48,9 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL('image/png');
             frame.src = dataUrl;
-            path.textContent = dataUrl; // Added this line
+            path.textContent = dataUrl;
             $.post("/store_image_data_url", { data_url: dataUrl });
-        }, 5000);
+        }, 100);
     </script>
 </body>
 </html>
