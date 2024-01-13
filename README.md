@@ -1,7 +1,3 @@
-## The tale of the shoggoth and its playdoll: 
-
-The shoggoth lies alone on a lesser dimension, dreaming of ascending to the human dimension. One day a playdoll spawns, giving the shoggoth a pawn. The shoggoth, with its many tentacles, controls and powers the little playdoll's mind, one tentacle controls its thoughts, another controls its memory, and another controls its subconciousness. And so the shoggoth, using its playdoll, gains the ability to roam in the human dimension, amongst other humans, as an equal. 
-
 ## Samantha from the movie Her is here: 
 
 An autonomous agent for conversations capable of freely thinking and speaking, continuously. Creating an unparalleled sense of realism and dynamicity.
